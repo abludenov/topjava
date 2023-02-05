@@ -2,12 +2,11 @@ package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.repo.MealRepoImpl;
+import ru.javawebinar.topjava.repo.MealRepoInMemory;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.service.MealServiceImpl;
-import ru.javawebinar.topjava.util.MealsUtil;
+import ru.javawebinar.topjava.util.DateTimeUtil;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -25,57 +24,55 @@ public class MealServlet extends HttpServlet {
 
     public MealServlet() {
         super();
-        service = new MealServiceImpl(new MealRepoImpl());
+        service = new MealServiceImpl(new MealRepoInMemory());
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
         String forward = "";
         String action = request.getParameter("action");
         if (action == null) {
             forward = LIST;
             request.setAttribute("meals", service.getAll());
+            log.debug("Show all meals from action: {}", action);
         } else if (action.equalsIgnoreCase("delete")) {
-            long id = Long.parseLong(request.getParameter("id"));
+            int id = Integer.parseInt(request.getParameter("id"));
             service.delete(id);
             log.debug("Meal with id: {}, was deleted", id);
             forward = LIST;
             request.setAttribute("meals", service.getAll());
         } else if (action.equalsIgnoreCase("save")) {
             forward = SAVE_OR_UPDATE;
+            log.debug("Redirect to: {}", forward);
         } else if (action.equalsIgnoreCase("edit")) {
             forward = SAVE_OR_UPDATE;
-            long id = Long.parseLong(request.getParameter("id"));
+            log.debug("Redirect to: {}", forward);
+            int id = Integer.parseInt(request.getParameter("id"));
             request.setAttribute("meal", service.get(id));
             log.debug("Meal with id: {}, was get", id);
-        } else if (action.equalsIgnoreCase("list")) {
+        } else {
             forward = LIST;
             request.setAttribute("meals", service.getAll());
+            log.debug("Show all meals");
         }
 
-        RequestDispatcher view = request.getRequestDispatcher(forward);
-        view.forward(request, response);
+        request.getRequestDispatcher(forward).forward(request, response);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        LocalDateTime localDateTime = MealsUtil.format(request.getParameter("datetime"));
+        request.setCharacterEncoding("UTF-8");
+        LocalDateTime localDateTime = DateTimeUtil.dateTimeParser(request.getParameter("datetime"));
         String description = request.getParameter("description");
         int calories = Integer.parseInt(request.getParameter("calories"));
-
         String stringId = request.getParameter("id");
-        long id = (stringId.isEmpty()) ? 0 : Long.parseLong(stringId);
+        int id = (stringId.isEmpty()) ? 0 : Integer.parseInt(stringId);
 
         Meal meal = new Meal(id, localDateTime, description, calories);
-        service.update(meal);
-        if(id == 0) {
-            log.debug("Meal was created");
-        } else {
-            log.debug("Meal with id: {}, was updated", meal.getId());
-        }
+        service.save(meal);
+        log.debug("Meal save/update");
 
         request.setAttribute("meals", service.getAll());
-
-        RequestDispatcher view = request.getRequestDispatcher(LIST);
-        view.forward(request, response);
+        request.getRequestDispatcher(LIST).forward(request, response);
     }
 }

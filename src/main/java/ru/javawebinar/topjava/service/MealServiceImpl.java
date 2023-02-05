@@ -3,7 +3,7 @@ package ru.javawebinar.topjava.service;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealTo;
 import ru.javawebinar.topjava.repo.MealRepo;
-import ru.javawebinar.topjava.repo.MealRepoImpl;
+import ru.javawebinar.topjava.repo.MealRepoInMemory;
 import ru.javawebinar.topjava.util.MealsUtil;
 
 import java.time.LocalTime;
@@ -15,26 +15,26 @@ public class MealServiceImpl implements MealService{
 
     public MealServiceImpl(MealRepo mealDao) {
         super();
-        this.mealDao = new MealRepoImpl();
+        this.mealDao = new MealRepoInMemory();
     }
 
     @Override
-    public Meal get(long id) {
+    public Meal get(Integer id) {
         return mealDao.get(id);
     }
 
     @Override
     public List<MealTo> getAll() {
-        return MealsUtil.filteredByStreams(mealDao.getAll(), LocalTime.of(0, 0), LocalTime.of(23,59, 59), MealsUtil.caloriesPerDay);
+        return MealsUtil.filteredByStreams(mealDao.getAll(), LocalTime.MIN, LocalTime.MAX, MealsUtil.CALORIES_PER_DAY);
     }
 
     @Override
-    public void update(Meal meal) {
-        mealDao.update(meal);
+    public void save(Meal meal) {
+        mealDao.save(meal);
     }
 
     @Override
-    public void delete(long id) {
+    public void delete(Integer id) {
         mealDao.delete(id);
     }
 }

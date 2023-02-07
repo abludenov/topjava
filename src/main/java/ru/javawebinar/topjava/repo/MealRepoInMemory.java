@@ -12,8 +12,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class MealRepoInMemory implements MealRepo {
 
-    AtomicInteger id = new AtomicInteger(8);
-    Map<Integer, Meal> meals;
+    private AtomicInteger id = new AtomicInteger(8);
+    private Map<Integer, Meal> meals;
 
     {
         meals = new ConcurrentHashMap<>();

@@ -3,8 +3,8 @@ package ru.javawebinar.topjava.web;
 import org.slf4j.Logger;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealTo;
+import ru.javawebinar.topjava.repo.InMemoryMealRepo;
 import ru.javawebinar.topjava.repo.MealRepo;
-import ru.javawebinar.topjava.repo.MealRepoInMemory;
 import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.util.MealsUtil;
 
@@ -26,19 +26,18 @@ public class MealServlet extends HttpServlet {
     private MealRepo repo;
 
     @Override
-    public void init() throws ServletException {
-        super.init();
-        repo = new MealRepoInMemory();
+    public void init() {
+        repo = new InMemoryMealRepo();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setCharacterEncoding("UTF-8");
-        String forward = "";
+        String forward;
         String action = request.getParameter("action");
         switch (action == null ? "list" : action) {
             case "save":
                 request.setAttribute("action", action);
+                request.setAttribute("meal", new Meal(LocalDateTime.now(), "Введите еду", 0));
                 forward = SAVE_OR_UPDATE;
                 log.debug("Redirect to: {}", forward);
                 break;
@@ -52,12 +51,11 @@ public class MealServlet extends HttpServlet {
                 break;
             case "delete":
                 request.getParameter("id");
-                int idDel = Integer.parseInt(request.getParameter("id"));
-                repo.delete(idDel);
-                log.debug("Meal with id: {}, was deleted", idDel);
-                forward = LIST;
-                request.setAttribute("meals", getAllMealTo());
-                break;
+                int idForDelete = Integer.parseInt(request.getParameter("id"));
+                repo.delete(idForDelete);
+                log.debug("Meal with id: {}, was deleted", idForDelete);
+                response.sendRedirect("meals");
+                return;
             case "list":
             default:
                 forward = LIST;
@@ -68,20 +66,21 @@ public class MealServlet extends HttpServlet {
         request.getRequestDispatcher(forward).forward(request, response);
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         request.setCharacterEncoding("UTF-8");
-        LocalDateTime localDateTime = DateTimeUtil.dateTimeParser(request.getParameter("datetime"));
+        LocalDateTime localDateTime = DateTimeUtil.dateTimeParse(request.getParameter("datetime"));
         String description = request.getParameter("description");
         int calories = Integer.parseInt(request.getParameter("calories"));
         String stringId = request.getParameter("id");
-        int id = (stringId.isEmpty()) ? 0 : Integer.parseInt(stringId);
-
-        Meal meal = new Meal(id, localDateTime, description, calories);
-        repo.save(meal);
+        if (stringId.isEmpty()) {
+            repo.saveOrUpdate(new Meal(localDateTime, description, calories));
+        } else {
+            repo.saveOrUpdate(new Meal(Integer.parseInt(stringId), localDateTime, description, calories));
+        }
         log.debug("Meal save/update");
 
         request.setAttribute("meals", getAllMealTo());
-        request.getRequestDispatcher(LIST).forward(request, response);
+        response.sendRedirect("meals");
     }
 
     private List<MealTo> getAllMealTo() {

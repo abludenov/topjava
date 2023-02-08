@@ -6,11 +6,11 @@ import java.util.List;
 
 public interface MealRepo {
 
-    Meal get(Integer id);
+    Meal get(int id);
 
     List<Meal> getAll();
 
-    void save(Meal meal);
+    Meal saveOrUpdate(Meal meal);
 
-    void delete(Integer id);
+    void delete(int id);
 }

@@ -13,7 +13,6 @@ public class MealsUtil {
 
     public static final int CALORIES_PER_DAY = 2000;
 
-
     public static List<MealTo> filteredByStreams(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         Map<LocalDate, Integer> caloriesSumByDate = meals.stream()
                 .collect(

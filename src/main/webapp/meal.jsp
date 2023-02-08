@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
-    <title>Add new meal</title>
+    <title>${param.action == 'save' ? 'Save meal' : 'Update meal'}</title>
 </head>
 <body>
 <form method="POST" name="formAddMeal">

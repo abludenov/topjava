@@ -1,11 +1,16 @@
 package ru.javawebinar.topjava.service;
 
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
-import ru.javawebinar.topjava.util.exception.NotFoundException;
 
+import java.time.LocalDate;
 import java.util.List;
+
+import static ru.javawebinar.topjava.util.DateTimeUtil.atStartOfDayOrMin;
+import static ru.javawebinar.topjava.util.DateTimeUtil.atStartOfNextDayOrMax;
+import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFoundWithId;
 
 @Service
 public class MealService {
@@ -17,36 +22,26 @@ public class MealService {
     }
 
     public Meal get(int id, int userId) {
-        Meal meal = repository.get(id);
-        if(meal.getUserId() == userId) {
-            return meal;
-        } else {
-            throw new NotFoundException("incorrect meal id for user id");
-        }
-    }
-
-    public Meal save(Meal meal, int userId) {
-        return repository.save(meal, userId);
-    }
-
-    public Meal update(Meal meal, int userId) {
-        if(meal.getUserId() == userId) {
-            return repository.save(meal, userId);
-        } else {
-            throw new NotFoundException("can't update this meal");
-        }
+        return checkNotFoundWithId(repository.get(id, userId), id);
     }
 
     public void delete(int id, int userId) {
-        Meal meal = repository.get(id);
-        if(meal.getUserId() == userId) {
-            repository.delete(id);
-        } else {
-            throw new NotFoundException("can't delete this meal");
-        }
+        checkNotFoundWithId(repository.delete(id, userId), id);
+    }
+
+    public List<Meal> getBetweenInclusive(@Nullable LocalDate startDate, @Nullable LocalDate endDate, int userId) {
+        return repository.getBetweenHalfOpen(atStartOfDayOrMin(startDate), atStartOfNextDayOrMax(endDate), userId);
     }
 
     public List<Meal> getAll(int userId) {
         return repository.getAll(userId);
+    }
+
+    public Meal update(Meal meal, int userId) {
+        return checkNotFoundWithId(repository.save(meal, userId), meal.getId());
+    }
+
+    public Meal save(Meal meal, int userId) {
+        return repository.save(meal, userId);
     }
 }

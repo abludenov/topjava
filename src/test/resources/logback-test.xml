@@ -22,7 +22,9 @@
     </logger>
 
     <logger name="ru.javawebinar.topjava" level="debug"/>
-    <logger name="org.springframework.orm.jpa.JpaTransactionManager" level="debug"/>
+    <!--<logger name="org.springframework.web.servlet" level="debug"/>-->
+    <logger name="org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver" level="debug"/>
+    <logger name="org.springframework.security" level="debug"/>
 
     <root level="INFO">
         <appender-ref ref="console"/>

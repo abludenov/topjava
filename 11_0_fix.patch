@@ -1,0 +1,36 @@
+Subject: [PATCH] 11_0_fix
+---
+Index: README.md
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/README.md b/README.md
+--- a/README.md	(revision 73942be1be2c5660e7eb9331f31adbcb557c6658)
++++ b/README.md	(date 1681939208749)
+@@ -11,7 +11,7 @@
+ - [Wiki](https://github.com/JavaOPs/topjava/wiki)
+ - [Wiki Git](https://github.com/JavaOPs/topjava/wiki/Git)
+ - [Wiki IDEA](https://github.com/JavaOPs/topjava/wiki/IDEA)
+-- [Демо разрабатываемого приложения](http://topjava.herokuapp.com/)
++- [Демо разрабатываемого приложения](http://javaops-demo.ru/topjava)
+ 
+ ### 26.01: Старт проекта
+ - Начало проверки [вступительного задания HW0](https://github.com/JavaOPs/topjava#-Домашнее-задание-hw0)
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pom.xml b/pom.xml
+--- a/pom.xml	(revision 73942be1be2c5660e7eb9331f31adbcb557c6658)
++++ b/pom.xml	(date 1681939208745)
+@@ -9,7 +9,7 @@
+     <version>1.0-SNAPSHOT</version>
+ 
+     <name>Calories Management</name>
+-    <url>http://topjava.herokuapp.com/</url>
++    <url>http://javaops-demo.ru/topjava</url>
+ 
+     <properties>
+         <java.version>17</java.version>
